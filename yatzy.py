@@ -85,12 +85,17 @@ def normalize(string: str) -> str:
     return string.lower()
 
 
-def convert_to_list(string):
-    string2 = string.replace(" ", "")
-    return [int(a) for a in str(string2)]
+def convert_to_list(string)->List[int]:
+    string2 = normalize(string)
+    if string2[0] == 'n':
+        return [-1]
+    elif string2[0] == 'a':
+        return [-2]
+    else:
+        return [int(a) for a in str(string2)]
 
 
-def roll_one_dice():
+def roll_one_dice()-> int:
     return randint(1, 6)
 
 
@@ -157,19 +162,20 @@ def welcome_players(players: List[Player]):
 
 
 def print_player_scores_left(player: Player):
-    print('------------------------------------')
+    print(f"{'':-<60}")
     print("availible types left:")
-    for i, score_key in enumerate(SCORE_SHEET):
-        if score_key in player.scores:
-            pass
-        else:
-            if i % 3 == 0:
-                print("")
+    print(f"{'':-<60}")
+    i = 1
+    for score_key in SCORE_SHEET:
+        if not score_key in player.scores:
             print(f"{'|': <4}", end='')
             print(f"{score_key: <16}", end='')
             print(f"{'': <2}", end='')
+            if i % 3 == 0:
+                print("")
+            i+=1
     print("")
-    print('------------------------------------')
+    print(f"{'':-<60}")
 
 
 def get_dices_to_reroll():
@@ -180,7 +186,11 @@ def get_dices_to_reroll():
         except ValueError:
             print("This was not a valid input please try again")
             continue
-        if len(dice_to_reroll) == 1 and dice_to_reroll[0] == 0:
+        if len(dice_to_reroll) == 1 and dice_to_reroll[0] == -2:
+            cls()
+            print("Rerolling ALL! dices!!")
+            return [1,2,3,4,5]
+        if len(dice_to_reroll) == 1 and (dice_to_reroll[0] == 0 or dice_to_reroll[0] == -1):
             cls()
             print("Great that you are happy already!!")
             return []
@@ -358,7 +368,6 @@ def print_end_score(players: List[Player]):
     print("")
     print("")
     print("Total score is:")
-
     print(f"{'Score:': <20}", end='')
     for player in players:
         print(f"{player.name : <20}", end='')
@@ -381,7 +390,6 @@ def print_end_score(players: List[Player]):
                 print(f"{player.first_bonus: <20}", end='')
             print("")
             print(f"{'':-<{width}}")
-
     print(f"{'':-<{width}}")
     print(f"{'Grand Total:': <20}", end='')
     for player in players:
@@ -394,7 +402,7 @@ def print_current_dice_roll(name: str, retry: int, dices: List[int]):
     print(f"{name}, here is your {ordinal_long(retry+1)} throw.")
     print(dices)
     print(" ^  ^  ^  ^  ^")
-    print(" 1  2  3  4  5 or 0")
+    print(" 1  2  3  4  5 or 0(none) or A(All)")
 
 
 def main():
