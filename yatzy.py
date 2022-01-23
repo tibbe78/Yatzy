@@ -16,7 +16,8 @@ max_retrows = 2
 
 @dataclass
 class ScoreTypes:
-    ''' a score Type '''
+    """[contain one type of yatzy score]
+    """
     name: str
     ok_answers: list[str]
     function_name: str
@@ -49,7 +50,8 @@ SCORE_SHEET = {
 
 @dataclass
 class Score:
-    ''' a single score '''
+    """[one single player score]
+    """    
 
     def __init__(self, name: str, value: int):
         self.name = name
@@ -61,7 +63,9 @@ class Score:
 
 @dataclass
 class Player:
-    ''' a Yatzy Player '''
+    """[a instance of a player]
+        Contains a Dict with the scores
+    """    
 
     def __init__(self, name: str):
         self.name = name
@@ -79,13 +83,29 @@ def cls():
 
 
 def normalize(string: str) -> str:
+    """[removes spaces and stuff in string]
+
+    Args:
+        string (str): [any string]
+
+    Returns:
+        str: [string without spaces or -_]
+    """    
     string = string.replace(' ', '')
     string = string.replace('-', '')
     string = string.replace('_', '')
     return string.lower()
 
 
-def convert_to_list(string)->List[int]:
+def convert_to_list(string:str) -> List[int]:
+    """[takes a string and makes a string of integers]
+
+    Args:
+        string ([str]): [any string of numbers + 'none' or 'all']
+
+    Returns:
+        List[int]: [list of integers -2 to 6]
+    """    
     string2 = normalize(string)
     if string2[0] == 'n':
         return [-1]
@@ -93,20 +113,21 @@ def convert_to_list(string)->List[int]:
         return [-2]
     else:
         return [int(a) for a in str(string2)]
+        
 
 
-def roll_one_dice()-> int:
+def roll_one_dice() -> int:
     return randint(1, 6)
 
 
-def roll_dices(amount):
+def roll_dices(amount:int)->List[int]:
     rolled_dices = []
     for x in range(amount):
         rolled_dices.append(roll_one_dice())
     return rolled_dices
 
 
-def get_amount_of_players():
+def get_amount_of_players()->int:
     answer = 0
     while answer < 1 or answer > max_players:
         try:
@@ -117,7 +138,7 @@ def get_amount_of_players():
     return answer
 
 
-def ordinal_short(number: int):
+def ordinal_short(number: int)->str:
     if number == 1:
         return "1st"
     elif number == 2:
@@ -128,7 +149,7 @@ def ordinal_short(number: int):
         return f"{number}th"
 
 
-def ordinal_long(number: int):
+def ordinal_long(number: int)->str:
     if number == 1:
         return "first"
     elif number == 2:
@@ -141,7 +162,7 @@ def ordinal_long(number: int):
         return f"{number}th"
 
 
-def init_players(number_of_players: int):
+def init_players(number_of_players: int)->List[Player]:
     _players = []
     for x in range(number_of_players):
         s = input(f"Enter name of {ordinal_short(x+1)} player: ")
@@ -150,7 +171,7 @@ def init_players(number_of_players: int):
     return _players
 
 
-def welcome_players(players: List[Player]):
+def welcome_players(players: List[Player]) -> None:
     print("Welcome!!", end=' ')
     pos = -1
     for player in players:
@@ -161,7 +182,7 @@ def welcome_players(players: List[Player]):
             print(player.name, end=', ')
 
 
-def print_player_scores_left(player: Player):
+def print_player_scores_left(player: Player) -> None:
     print(f"{'':-<60}")
     print("availible types left:")
     print(f"{'':-<60}")
@@ -173,12 +194,12 @@ def print_player_scores_left(player: Player):
             print(f"{'': <2}", end='')
             if i % 3 == 0:
                 print("")
-            i+=1
+            i += 1
     print("")
     print(f"{'':-<60}")
 
 
-def get_dices_to_reroll():
+def get_dices_to_reroll()->List[int]:
     while(True):
         try:
             dice_to_reroll = convert_to_list(
@@ -189,7 +210,7 @@ def get_dices_to_reroll():
         if len(dice_to_reroll) == 1 and dice_to_reroll[0] == -2:
             cls()
             print("Rerolling ALL! dices!!")
-            return [1,2,3,4,5]
+            return [1, 2, 3, 4, 5]
         if len(dice_to_reroll) == 1 and (dice_to_reroll[0] == 0 or dice_to_reroll[0] == -1):
             cls()
             print("Great that you are happy already!!")
@@ -207,7 +228,7 @@ def get_dices_to_reroll():
             return dice_to_reroll
 
 
-def simple_score_count(dices: List[int], dice_to_count: int):
+def simple_score_count(dices: List[int], dice_to_count: int)->int:
     score_value = 0
     for dice in dices:
         if dice_to_count == dice:
@@ -215,7 +236,7 @@ def simple_score_count(dices: List[int], dice_to_count: int):
     return score_value
 
 
-def count_pair_score(dices: List[int], notused):
+def count_pair_score(dices: List[int], notused)->int:
     dices.sort(reverse=True)
     for i, dice in enumerate(dices):
         if i > len(dices)-2:
@@ -225,7 +246,7 @@ def count_pair_score(dices: List[int], notused):
     return 0
 
 
-def count_two_pairs_score(dices: List[int], notused):
+def count_two_pairs_score(dices: List[int], notused)->int:
     dices.sort(reverse=True)
     temp_score = 0
     prev_dice = 0
@@ -242,7 +263,7 @@ def count_two_pairs_score(dices: List[int], notused):
     return 0
 
 
-def count_x_of_same_kind_score(dices: List[int], how_many: int):
+def count_x_of_same_kind_score(dices: List[int], how_many: int)->int:
     dices.sort(reverse=True)
     temp_score = 0
     found = 0
@@ -262,7 +283,7 @@ def count_x_of_same_kind_score(dices: List[int], how_many: int):
     return 0
 
 
-def count_straight_score(dices: List[int], is_large: int):
+def count_straight_score(dices: List[int], is_large: int)->int:
     dices.sort(reverse=False)
     if is_large == 1:
         prev_dice = 1
@@ -281,7 +302,7 @@ def count_straight_score(dices: List[int], is_large: int):
         return 15
 
 
-def count_full_house_score(dices: List[int], not_used):
+def count_full_house_score(dices: List[int], not_used)->int:
     dices.sort(reverse=False)
     temp_score = 0
     last_dice = 0
@@ -308,7 +329,7 @@ def count_full_house_score(dices: List[int], not_used):
     return 0
 
 
-def count_yatzy_score(dices: List[int], not_used):
+def count_yatzy_score(dices: List[int], not_used)->int:
     prev_dice = dices[0]
     for dice in dices:
         if dice != prev_dice:
@@ -316,7 +337,7 @@ def count_yatzy_score(dices: List[int], not_used):
     return 50
 
 
-def count_chance_score(dices: List[int], not_used):
+def count_chance_score(dices: List[int], not_used)->int:
     score = 0
     for dice in dices:
         score += dice
@@ -349,7 +370,7 @@ def fake_score(players: List[Player]):
             player.scores[key] = Score(key, randint(0, 20))
 
 
-def calculate_total_score(players: List[Player]):
+def calculate_total_score(players: List[Player])->None:
     for player in players:
         tempbonus = 0
         for key1, score1 in player.scores.items():
@@ -363,7 +384,7 @@ def calculate_total_score(players: List[Player]):
             player.total_score += 50
 
 
-def print_end_score(players: List[Player]):
+def print_end_score(players: List[Player])->None:
     width = (len(players)*20)+10
     print("")
     print("")
